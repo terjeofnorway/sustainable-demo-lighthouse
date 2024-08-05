@@ -1,0 +1,14 @@
+#root {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 1.25rem;
+}
+
+:root {
+  --primary-action: #f50057;
+  --primary-background: #961844;
+  --secondary-background: #b92e5f;
+  --secondary-background-hover: #c4396a;
+  --white: #eeeeee;
+}

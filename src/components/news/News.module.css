@@ -1,0 +1,17 @@
+.news {
+  width: 100%;
+  background-color: var(--primary-background);
+}
+
+.newsContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  padding: 1rem;
+  align-items: stretch;
+}
+
+.header {
+  font-weight: 300;
+  padding-top: 1rem;
+}
