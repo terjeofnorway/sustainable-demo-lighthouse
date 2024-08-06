@@ -1,6 +1,7 @@
 .news {
   width: 100%;
   background-color: var(--primary-background);
+  padding: 1rem 0 2rem;
 }
 
 .newsContainer {
@@ -9,6 +10,10 @@
   gap: 1rem;
   padding: 1rem;
   align-items: stretch;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 }
 
 .header {

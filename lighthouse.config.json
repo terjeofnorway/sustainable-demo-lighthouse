@@ -1,0 +1,14 @@
+{
+  "extends": "lighthouse:default",
+  "settings": {
+    "view": true,
+    "formFactor": "mobile",
+    "throttlingMethod": "simulate",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 30000,
+      "cpuSlowdownMultiplier": 4
+    }
+  },
+  "audits": ["largest-contentful-paint-element"]
+}

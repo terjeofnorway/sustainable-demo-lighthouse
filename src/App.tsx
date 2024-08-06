@@ -1,9 +1,10 @@
 import { Header } from './components/header/Header';
 import { News } from './components/news/News';
 
-import './App.css';
 import { NewsItemData } from './types/NewsData';
 import { Footer } from './components/footer/Footer';
+
+import './App.css';
 
 const newsData: NewsItemData[] = [
   {

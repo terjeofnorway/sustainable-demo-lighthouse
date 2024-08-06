@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "analyze": "lighthouse http://localhost:5173 --view --chrome-path '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'",
+    "analyze": "lighthouse http://localhost:5173 --config-path=./lighthouse.config.json --output-path=./lighthouse-report.html",
     "preview": "vite preview"
   },
   "dependencies": {
