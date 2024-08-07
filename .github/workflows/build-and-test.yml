@@ -17,20 +17,28 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
       - name: Install dependencies
-        run: bun ci
+        run: bun install --frozen-lockfile
       - name: Build application
         run: bun run build
       - name: Test application
         run: bun test
-      - name: Send test report to Slack
+      - name: Configure Git
         run: |
-          echo "Sending test report to Slack..."
-          curl -F file=@lighthouse-report.html -F "initial_comment=Here is the lighthouse report" -F channels=reports -H "Authorization: Bearer ${{ secrets.SLACK_TOKEN }}" https://slack.com/api/files.upload
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Deploy to GitHub Pages
+        run: |
+          mkdir -p report
+          cd report
+          git clone https://${{ secrets.PAGES_TOKEN}}@github.com/terjeofnorway/terjeofnorway.github.io.git .
+          git pull origin main
+          mv ../lighthouse-report.html .
+          git add .
+          git commit -m "Deploy Lighthouse report"
+          git push origin main
         env:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
