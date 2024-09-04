@@ -21,8 +21,12 @@ jobs:
         uses: oven-sh/setup-bun@v2
       - name: Install dependencies
         run: bun install --frozen-lockfile
+      - name: Install lchr
+        run: bun add -g @lhci/cli@0.14.x
       - name: Build application
         run: bun run build
+      - name: Test application
+        run: bun test
       - name: Test application
         run: bun test
       - name: Configure Git
@@ -30,131 +34,12 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Deploy to GitHub Pages
-        run: |
-          mkdir -p report
-          cd report
-          git clone https://${{ secrets.PAGES_TOKEN}}@github.com/terjeofnorway/terjeofnorway.github.io.git .
-          git pull origin main
-          mv ../lighthouse-report.html .
-          git add .
-          git commit -m "Deploy Lighthouse report"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Post to Slack
         run: |
-          curl --location '${{ secrets.SLACK_WEBHOOK}}' \
+          curl --location '${{ secrets.SLACK_LIGHTHOUSE_PROXY_URL}}' \
           --header 'Content-type: application/json' \
           --data '{
-            "blocks": [
-              {
-                "type": "header",
-                "text": {
-                  "type": "plain_text",
-                  "text": "Ny versjon: 3.4.3",
-                  "emoji": true
-                }
-              },
-              {
-                "type": "section",
-                "text": {
-                  "type": "plain_text",
-                  "text": "En ny versjon har nettopp blitt satt i prod! :tada: Nedenfor er en oppsummering av viktigste metrikker fra Lighthouse.",
-                  "emoji": true
-                }
-              },
-              {
-                "type": "divider"
-              },
-              {
-                "type": "rich_text",
-                "elements": [
-                  {
-                    "type": "rich_text_section",
-                    "elements": [
-                      {
-                        "type": "emoji",
-                        "name": "white_check_mark"
-                      },
-                      {
-                        "type": "text",
-                        "text": " "
-                      },
-                      {
-                        "type": "text",
-                        "text": "First Contentful Paint: 1,7s"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "divider"
-              },
-              {
-                "type": "rich_text",
-                "elements": [
-                  {
-                    "type": "rich_text_section",
-                    "elements": [
-                      {
-                        "type": "emoji",
-                        "name": "warning"
-                      },
-                      {
-                        "type": "text",
-                        "text": " "
-                      },
-                      {
-                        "type": "text",
-                        "text": "Largest Contentful Paint: 2,6s"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "divider"
-              },
-              {
-                "type": "rich_text",
-                "elements": [
-                  {
-                    "type": "rich_text_section",
-                    "elements": [
-                      {
-                        "type": "emoji",
-                        "name": "grimacing"
-                      },
-                      {
-                        "type": "text",
-                        "text": " "
-                      },
-                      {
-                        "type": "text",
-                        "text": "Total bundle-størrelse: 554 kb"
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "actions",
-                "elements": [
-                  {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "Åpne hele rapporten her :link:",
-                      "emoji": true
-                    },
-                    "value": "open-report",
-                    "action_id": "open-report"
-                  }
-                ]
-              }
-            ]
+            "version": "1.2.3"
           }'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
