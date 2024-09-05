@@ -22,24 +22,33 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Install lchr
-        run: bun add -g @lhci/cli@0.14.x
+        run: bun add -g @lhci/cli
       - name: Build application
         run: bun run build
       - name: Test application
         run: bun test
-      - name: Test application
-        run: bun test
-      - name: Configure Git
+      # Step 6: Run Lighthouse CI against the 'dist' folder
+      - name: Run Lighthouse CI
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-      - name: Post to Slack
-        run: |
-          curl --location '${{ secrets.SLACK_LIGHTHOUSE_PROXY_URL}}' \
-          --header 'Content-type: application/json' \
-          --data '{
-            "version": "1.2.3"
-          }'
+          lhci autorun --collect.url=http://localhost:5000 \
+          --collect.staticDistDir=./dist \
+          --collect.settings.output=json \
+          --collect.outputPath="./lhci-report" \
+          --upload.target=filesystem --upload.outputDir=./lhci-report --upload.reportFilenamePattern="report.%%EXTENSION%%"
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 7: Save JSON output as artifact
+      - name: Upload LHCI results
+        uses: actions/upload-artifact@v2
+        with:
+          name: lhci-results
+          path: ./lhci-report
+      # Step 8: CURL POST to service with JSON body
+      - name: Post LHCI results to external service
+        run: |
+          jq --arg version '1.0.0' '. + {version: $version}' ./lhci-report/report.json > ./lhci-report/temp-report.json
+
+          curl -X POST "${{ secrets.SLACK_LIGHTHOUSE_PROXY_URL}}" \
+          -H "Content-Type: application/json" \
+          -d "@./lhci-report/temp-report.json"

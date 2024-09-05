@@ -1,0 +1,38 @@
+[
+  {
+    "url": "http://localhost:56141/",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/terjekarlsen/Dev/Systek/demos/odin-2024/lighthouse/lighthouse-demo/lhci-report/report.html",
+    "jsonPath": "/Users/terjekarlsen/Dev/Systek/demos/odin-2024/lighthouse/lighthouse-demo/lhci-report/report.json",
+    "summary": {
+      "performance": 0.85,
+      "accessibility": 1,
+      "best-practices": 0.96,
+      "seo": 0.91
+    }
+  },
+  {
+    "url": "http://localhost:56141/",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/terjekarlsen/Dev/Systek/demos/odin-2024/lighthouse/lighthouse-demo/lhci-report/report.html",
+    "jsonPath": "/Users/terjekarlsen/Dev/Systek/demos/odin-2024/lighthouse/lighthouse-demo/lhci-report/report.json",
+    "summary": {
+      "performance": 0.86,
+      "accessibility": 1,
+      "best-practices": 0.96,
+      "seo": 0.91
+    }
+  },
+  {
+    "url": "http://localhost:56141/",
+    "isRepresentativeRun": true,
+    "htmlPath": "/Users/terjekarlsen/Dev/Systek/demos/odin-2024/lighthouse/lighthouse-demo/lhci-report/report.html",
+    "jsonPath": "/Users/terjekarlsen/Dev/Systek/demos/odin-2024/lighthouse/lighthouse-demo/lhci-report/report.json",
+    "summary": {
+      "performance": 0.86,
+      "accessibility": 1,
+      "best-practices": 0.96,
+      "seo": 0.91
+    }
+  }
+]
