@@ -9,18 +9,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: [22]
+
     steps:
-    # Checkout the repository on the branch where the pull request is created
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    # Install Bun (a fast JavaScript bundler and runtime)
-    - name: Install Bun
-      run: |
-        curl -fsSL https://bun.sh/install | bash
-        export BUN_INSTALL="$HOME/.bun"
-        export PATH="$BUN_INSTALL/bin:$PATH"
-
-    # Build the project using Bun
-    - name: Build with Bun
-      run: bun run build
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+      - name: Build project
+        run: bun run build
