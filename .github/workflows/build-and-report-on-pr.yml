@@ -8,11 +8,12 @@ on:
 
 jobs:
   build:
+    permissions: write-all
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [22]
+        node-version: [20]
 
     steps:
       - name: Checkout code
@@ -23,6 +24,29 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Build project
         run: bun run build
+      - name: Create Check Run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          response=$(curl -L -X POST \
+           -H "Accept: application/vnd.github+json" \
+           -H "Authorization: Bearer $GH_TOKEN"\
+           -H "X-GitHub-Api-Version: 2022-11-28" \
+           https://api.github.com/repos/${{ github.repository }}/check-runs \
+           -d '{"name":"migthy_test", "head_sha":"${{ github.event.pull_request.head.sha }}", "status":"in_progress","external_id":"40","output":{"title":"A Mighty Summary", "summary":"This is a summary", "text":"This is a text"}}')
+          id=$(echo $response | jq -r '.id') # Extract the 'id' field using jq
+          echo "ID is $id"
+          echo "ID=$id" >> $GITHUB_ENV # Store the id in the environment
       - name: Produce a warning
         run: |
           echo "::warning::This is just a warning. No failure here."
+      - name: Update Check Run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl -L -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN"\
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/check-runs/${{ env.ID }} \
+            -d '{"conclusion":"action_required"}'
