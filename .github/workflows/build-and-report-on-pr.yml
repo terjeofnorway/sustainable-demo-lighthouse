@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,3 +21,6 @@ jobs:
         uses: oven-sh/setup-bun@v2
       - name: Build project
         run: bun run build
+      - name: Produce a warning
+        run: |
+          echo "::warning::This is just a warning. No failure here."
