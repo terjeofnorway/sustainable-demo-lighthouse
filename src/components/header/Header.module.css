@@ -18,7 +18,7 @@
 .signupButton {
   background-color: var(--primary-action);
   border-radius: 5px;
-  border: none;
+  border: var(--primary-background) 5px solid;
   color: white;
   cursor: pointer;
   font-size: 2rem;

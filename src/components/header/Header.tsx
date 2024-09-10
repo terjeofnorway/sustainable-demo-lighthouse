@@ -5,7 +5,7 @@ export const Header = () => {
     <header className={style.header}>
       <div className={style.onboarding}>
         <a className={style.signupButton} href="/signup">
-          Kjøp strikkekurs her!
+          Kjøp berg-og-dalbane-strikkekurs her!
         </a>
       </div>
     </header>
