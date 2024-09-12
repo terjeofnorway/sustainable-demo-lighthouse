@@ -39,7 +39,7 @@ jobs:
 
       # Step 7: Save JSON output as artifact
       - name: Upload LHCI results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: lhci-results
           path: ./lhci-report
