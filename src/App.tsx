@@ -8,9 +8,9 @@ import './App.css';
 
 const newsData: NewsItemData[] = [
   {
-    title: 'Hurtigstrikk',
-    text: 'Strikk en genser på bare 4,5 minutter mens du opplever negativ G hele 4 ganger!',
-    image: 'speed-sweater.webp',
+    title: 'Tøff Hurtigstrikk',
+    text: 'Strikk en piratgenser på bare 4,5 minutter mens du opplever negativ G hele 4 ganger!',
+    image: 'pirate.jpg',
     url: '/hurtigstrikk',
   },
   {
