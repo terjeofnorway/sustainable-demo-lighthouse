@@ -56,5 +56,6 @@
   border-top-right-radius: 0.5rem;
   max-width: 100%;
   transition: transform 0.5s;
+  transform: translateY(-50px);
   width: fit-content;
 }
