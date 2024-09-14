@@ -11,7 +11,7 @@ export const NewsItem = ({ data }: NewsItemProps) => {
       <div className={style.newsImageContainer}>
         <img
           className={style.newsImage}
-          src={`/public/images/${data.image}`}
+          src={`/images/${data.image}`}
           alt={data.title}
         />
       </div>
