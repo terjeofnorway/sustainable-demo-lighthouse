@@ -1,4 +1,4 @@
-name: Build on Pull Request
+name: Build, test and report sitespeed on Pull Requerst
 
 on:
   pull_request:
@@ -8,11 +8,12 @@ on:
 
 jobs:
   build:
+    permissions: write-all
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [22]
+        node-version: [20]
 
     steps:
       - name: Checkout code
@@ -20,6 +21,74 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: |
+          bun install --frozen-lockfile
+          sudo apt-get update
+          sudo apt-get install -y \
+            libappindicator1 \
+            fonts-liberation \
+            libasound2 \
+            libatk-bridge2.0-0 \
+            libatk1.0-0 \
+            libcups2 \
+            libdbus-1-3 \
+            libdrm2 \
+            libgbm1 \
+            libnspr4 \
+            libnss3 \
+            libxss1 \
+            libxcomposite1 \
+            libxrandr2 \
+            xdg-utils \
+            wget
       - name: Build project
         run: bun run build
+      - name: Create Check Run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          response=$(curl -L -X POST \
+           -H "Accept: application/vnd.github+json" \
+           -H "Authorization: Bearer $GH_TOKEN"\
+           -H "X-GitHub-Api-Version: 2022-11-28" \
+           https://api.github.com/repos/${{ github.repository }}/check-runs \
+           -d '{"name":"sitespeed_footprint_test", "head_sha":"${{ github.event.pull_request.head.sha }}", "status":"in_progress","external_id":"40","output":{"title":"Running Sitespeed.io sustainability testing", "summary":"This will emit warning if total transfer size is too big"}}')
+          id=$(echo $response | jq -r '.id') # Extract the 'id' field using jq
+          echo "ID is $id"
+          echo "ID=$id" >> $GITHUB_ENV # Store the id in the environment
+      - name: Start local server for testing
+        run: bunx http-server ./dist -p 3020 &
+      - name: Run sitespeed test
+        run: |
+          npx sitespeed.io http://localhost:3020 --outputFolder ./sitespeed-results --browsertime.headless true --plugins.add analysisstorer
+      - name: Analyzing sitespeed report
+        id: sitespeedreport
+        run: |
+          sudo apt-get install jq -y
+          max_value=$(jq '.transferSize.max' ./sitespeed-results/data/pagexray.summary-total.json)
+          echo "Max transfer size: $max_value"
+          echo "max_size=$max_value" >> "$GITHUB_OUTPUT"
+      - name: Fail check run if size > 2MB
+        if: ${{ fromJson(steps.sitespeedreport.outputs.max_size) > 2000000 }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Max size is ${{ steps.sitespeedreport.outputs.max_size }}"
+          curl -L -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN"\
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/check-runs/${{ env.ID }} \
+            -d '{"conclusion":"action_required", "output":{"title":"Transfer size too large", "summary":"The transfer size is too large"}}'
+      - name: Sucess check run if size < 2MB
+        if: ${{ fromJson(steps.sitespeedreport.outputs.max_size) < 2000000 }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Max size is ${{ steps.sitespeedreport.outputs.max_size }}"
+          curl -L -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN"\
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/check-runs/${{ env.ID }} \
+            -d '{"conclusion":"success"}'
